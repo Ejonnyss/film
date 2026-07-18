@@ -67,10 +67,23 @@ NEG_IMAGE = (
     "fantasy costume, steampunk goggles, tattoos on face"
 )
 
-NEG_NO_PEOPLE = (
-    "person, people, woman, man, girl, human, face, portrait, character, "
-    "figure, silhouette of a person, crowd, hands, body"
+NEG_NO_HUMANS = (
+    "person, people, woman, man, human, face, portrait, character, "
+    "figure, crowd, hands, body, limbs"
 )
+
+NEG_NO_FACES = (
+    "close-up face, facial portrait, head and shoulders portrait, detailed face, "
+    "eye contact with camera, character portrait"
+)
+
+NEG_LEVEL_A_IDS = {
+    "S01_SH001", "S01_SH005", "S01_SH006", "S01_SH018", "S01_SH028", "S01_SH042",
+}
+NEG_LEVEL_B_IDS = {
+    "S01_SH002", "S01_SH009", "S01_SH014", "S01_SH020", "S01_SH032", "S01_SH036",
+    "S01_SH039",
+}
 
 NEG_VIDEO = (
     "wrong identity, identity drift, face morphing, face blending, swapped faces, "
@@ -134,8 +147,8 @@ def composition_anchor(shot_size):
         "силуэтный крупный": (
             "close-up backlit silhouette shot, head and shoulders only"
         ),
-        "макро": "extreme macro detail shot, object fills the frame, no people, no faces",
-        "деталь": "extreme macro detail shot, object fills the frame, no people, no faces",
+        "макро": "extreme macro detail shot, focal detail fills the frame",
+        "деталь": "extreme macro detail shot, focal detail fills the frame",
         "верхний": "top-down overhead shot, camera directly above the subject",
     }
     try:
@@ -144,12 +157,13 @@ def composition_anchor(shot_size):
         raise ValueError("Нет композиционного якоря для крупности: %s" % shot_size) from exc
 
 
-def use_no_people_negative(who, non_explicit_water_scene, shot_size):
-    return (
-        who == "none"
-        and not non_explicit_water_scene
-        and shot_size in {"макро", "деталь", "общий"}
-    )
+def negative_level(shot_id):
+    """Explicit shot policy: never infer human presence from who/shot size."""
+    if shot_id in NEG_LEVEL_A_IDS:
+        return "A"
+    if shot_id in NEG_LEVEL_B_IDS:
+        return "B"
+    return "C"
 
 # --------------------------------------------------------------------------
 # ПОКАДРОВЫЙ ПЛАН — 8 актов, ~5.5 минуты
@@ -436,10 +450,12 @@ def build():
             parts.append(TASTEFUL)
         parts.append(FRAME_GUARD)
 
-        no_people = use_no_people_negative(who, tasteful, size)
+        neg_level = negative_level(sid)
         keyframe_negative = NEG_IMAGE
-        if no_people:
-            keyframe_negative += ", " + NEG_NO_PEOPLE
+        if neg_level == "A":
+            keyframe_negative += ", " + NEG_NO_HUMANS
+        elif neg_level == "B":
+            keyframe_negative += ", " + NEG_NO_FACES
 
         shots.append({
             "shot_id": sid,
@@ -455,7 +471,7 @@ def build():
             "face_targets": ({"mary": "left", "john": "right"} if who == "both"
                              else ({who: "largest"} if faces else {})),
             "non_explicit_water_scene": bool(tasteful),
-            "no_people_negative_applied": no_people,
+            "negative_level": neg_level,
             "keyframe_prompt": ", ".join(parts),
             "keyframe_negative": keyframe_negative,
             "motion_prompt": motion + " " + ID_HOLD_VIDEO,
@@ -493,7 +509,8 @@ def build():
             "style_base": STYLE_BASE, "style_character": STYLE_CHARACTER,
             "identity_single": ID_SINGLE, "identity_pair": ID_PAIR,
             "tasteful": TASTEFUL, "negative_image": NEG_IMAGE,
-            "negative_no_people": NEG_NO_PEOPLE,
+            "negative_no_humans": NEG_NO_HUMANS,
+            "negative_no_faces": NEG_NO_FACES,
             "negative_video": NEG_VIDEO, "identity_hold_video": ID_HOLD_VIDEO,
         },
         "shots": shots,
@@ -505,10 +522,17 @@ def build():
 
     faces_n = sum(1 for s in shots if s["apply_face_id"])
     both_n = sum(1 for s in shots if s["who"] == "both")
+    levels = {level: sum(s["negative_level"] == level for s in shots)
+              for level in ("A", "B", "C")}
+    assert levels == {"A": 6, "B": 7, "C": 46}, levels
+    assert NEG_LEVEL_A_IDS | NEG_LEVEL_B_IDS <= {s["shot_id"] for s in shots}
+    assert NEG_LEVEL_A_IDS.isdisjoint(NEG_LEVEL_B_IDS)
     print("OK -> %s" % OUT)
     print("Планов: %d | хронометраж: %.1f c (%d:%02d)"
           % (len(shots), total, int(total // 60), int(total % 60)))
     print("С подстановкой лиц: %d (из них парных: %d)" % (faces_n, both_n))
+    print("Уровни негатива: A=%d | B=%d | C=%d"
+          % (levels["A"], levels["B"], levels["C"]))
     sections = {}
     for s in shots:
         sections[s["section"]] = sections.get(s["section"], 0) + s["duration_sec"]
