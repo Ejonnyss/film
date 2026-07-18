@@ -24,15 +24,18 @@ SEED_STEP = 137
 # Общие блоки (из M1_8GB_FACE_ID_ARCANE_GUIDE_RU.md, разделы 6-8)
 # --------------------------------------------------------------------------
 
-STYLE = (
-    "arcane style, original prestige animated drama, "
-    "painterly 3D character design with hand-painted 2D brush textures, "
-    "expressive angular facial planes, sculpted facial features, "
+STYLE_BASE = (
+    "painterly hand-painted 2D brush textures over sculpted forms, "
     "visible controlled brush strokes, mature cinematic atmosphere, "
     "deep teal shadows, warm amber highlights, subtle magenta accents, "
-    "volumetric sea mist, cinematic composition, detailed expressive eyes, "
-    "restrained color palette, shallow depth of field, 35mm film language, "
-    "coherent anatomy, clearly adult characters"
+    "volumetric sea mist, cinematic composition, restrained color palette, "
+    "shallow depth of field, 35mm film language, prestige animated drama"
+)
+
+STYLE_CHARACTER = (
+    "painterly 3D character design, expressive angular facial planes, "
+    "sculpted facial features, detailed expressive eyes, coherent anatomy, "
+    "clearly adult characters"
 )
 
 ID_SINGLE = (
@@ -59,7 +62,14 @@ NEG_IMAGE = (
     "fused fingers, malformed hands, photorealistic live action, glossy plastic CGI, "
     "flat anime, chibi, childish proportions, oversaturated, washed out, overexposed, "
     "underexposed, low detail, blurry, jpeg artifacts, text, subtitles, watermark, logo, "
-    "explicit nudity, sexual act"
+    "explicit nudity, sexual act, blue hair, pink hair, green hair, neon hair, "
+    "league of legends character, jinx, vi, caitlyn, video game character, "
+    "fantasy costume, steampunk goggles, tattoos on face"
+)
+
+NEG_NO_PEOPLE = (
+    "person, people, woman, man, girl, human, face, portrait, character, "
+    "figure, silhouette of a person, crowd, hands, body"
 )
 
 NEG_VIDEO = (
@@ -90,7 +100,7 @@ TASTEFUL = (
 )
 
 LOOK_MARY = (
-    "MARY: clearly adult woman, long dark brown slightly wavy hair, "
+    "MARY: clearly adult woman with light skin, long dark brown slightly wavy hair, "
     "green-hazel almond-shaped eyes, soft full lips, delicate natural beauty, "
     "short sleeveless deep-teal wrap dress"
 )
@@ -99,6 +109,47 @@ LOOK_JOHN = (
     "light stubble, athletic build, off-white cotton shirt with rolled sleeves "
     "and sand-colored shorts"
 )
+
+FRAME_GUARD = "16:9 cinematic composition, no text, no watermark"
+
+
+def composition_anchor(shot_size):
+    """Return one explicit camera/composition anchor for every size in SHOTS."""
+    if "двухплан" in shot_size:
+        return "two-shot, both subjects visible in frame"
+
+    anchors = {
+        "общий": (
+            "extreme wide establishing landscape shot, camera far from subject, "
+            "vast open space"
+        ),
+        "очень общий": (
+            "extreme wide establishing landscape shot, camera far from subject, "
+            "vast open space"
+        ),
+        "общий силуэт": "wide backlit silhouette shot, subject small in frame",
+        "средний": "medium shot, waist up, subject centered",
+        "средний силуэт": "medium backlit silhouette shot, waist up, subject centered",
+        "крупный": "close-up shot of a face, head and shoulders only",
+        "силуэтный крупный": (
+            "close-up backlit silhouette shot, head and shoulders only"
+        ),
+        "макро": "extreme macro detail shot, object fills the frame, no people, no faces",
+        "деталь": "extreme macro detail shot, object fills the frame, no people, no faces",
+        "верхний": "top-down overhead shot, camera directly above the subject",
+    }
+    try:
+        return anchors[shot_size]
+    except KeyError as exc:
+        raise ValueError("Нет композиционного якоря для крупности: %s" % shot_size) from exc
+
+
+def use_no_people_negative(who, non_explicit_water_scene, shot_size):
+    return (
+        who == "none"
+        and not non_explicit_water_scene
+        and shot_size in {"макро", "деталь", "общий"}
+    )
 
 # --------------------------------------------------------------------------
 # ПОКАДРОВЫЙ ПЛАН — 8 актов, ~5.5 минуты
@@ -357,6 +408,7 @@ def build():
     shots = []
     for i, (section, size, camera, t, who, faces, tasteful, scene, motion) in enumerate(SHOTS):
         sid = "S01_SH%03d" % (i + 1)
+        anchor = composition_anchor(size)
 
         looks = []
         if who in ("mary", "both"):
@@ -372,12 +424,22 @@ def build():
             scene = (scene + ", MARY stays on frame-left and JOHN stays on frame-right, "
                      "two clearly separated faces with visible space between them")
 
-        parts = [STYLE, scene] + looks
+        # Порядок намеренно фиксирован: композиция -> сцена -> внешность ->
+        # identity -> общий стиль -> персонажный стиль -> tasteful guard.
+        parts = [anchor, scene] + looks
         if identity:
             parts.append(identity)
+        parts.append(STYLE_BASE)
+        if who != "none":
+            parts.append(STYLE_CHARACTER)
         if tasteful:
             parts.append(TASTEFUL)
-        parts.append("16:9 cinematic composition, no text, no watermark, no other people")
+        parts.append(FRAME_GUARD)
+
+        no_people = use_no_people_negative(who, tasteful, size)
+        keyframe_negative = NEG_IMAGE
+        if no_people:
+            keyframe_negative += ", " + NEG_NO_PEOPLE
 
         shots.append({
             "shot_id": sid,
@@ -393,8 +455,9 @@ def build():
             "face_targets": ({"mary": "left", "john": "right"} if who == "both"
                              else ({who: "largest"} if faces else {})),
             "non_explicit_water_scene": bool(tasteful),
+            "no_people_negative_applied": no_people,
             "keyframe_prompt": ", ".join(parts),
-            "keyframe_negative": NEG_IMAGE,
+            "keyframe_negative": keyframe_negative,
             "motion_prompt": motion + " " + ID_HOLD_VIDEO,
             "motion_negative": NEG_VIDEO,
         })
@@ -427,8 +490,10 @@ def build():
                                "user_3GgYm9K5VTOcRs8lNMJHlvKh0iL/"
                                "hf_20260718_190542_6d8a5c8c-4312-4cdb-8969-b3e5b347842b.png"),
         "shared_blocks": {
-            "style": STYLE, "identity_single": ID_SINGLE, "identity_pair": ID_PAIR,
+            "style_base": STYLE_BASE, "style_character": STYLE_CHARACTER,
+            "identity_single": ID_SINGLE, "identity_pair": ID_PAIR,
             "tasteful": TASTEFUL, "negative_image": NEG_IMAGE,
+            "negative_no_people": NEG_NO_PEOPLE,
             "negative_video": NEG_VIDEO, "identity_hold_video": ID_HOLD_VIDEO,
         },
         "shots": shots,
