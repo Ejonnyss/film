@@ -1,0 +1,578 @@
+{
+  "project": "Пляж",
+  "version": 2,
+  "film_duration_sec": 311.5,
+  "line_count": 39,
+  "engines": {
+    "primary": "edge-tts (нейронные голоса Microsoft, бесплатно, без ключа)",
+    "offline": "silero (локально, без интернета)",
+    "cloning": "XTTS v2 (клонирование — можно озвучить героев своими голосами)"
+  },
+  "voices": {
+    "narrator": {
+      "title": "Рассказчик",
+      "edge": {
+        "voice": "ru-RU-DmitryNeural",
+        "rate": "-12%",
+        "pitch": "-3Hz",
+        "volume": "+0%"
+      },
+      "silero": {
+        "speaker": "eugene"
+      },
+      "xtts": {
+        "reference_wav": "ref_narrator.wav"
+      },
+      "post": "eq_warm",
+      "note": "Медленно, тепло, с паузами. Это голос автора, не участник сцены."
+    },
+    "john": {
+      "title": "Джон",
+      "edge": {
+        "voice": "en-US-AndrewMultilingualNeural",
+        "rate": "-4%",
+        "pitch": "-1Hz",
+        "volume": "+0%"
+      },
+      "edge_fallback": {
+        "voice": "ru-RU-DmitryNeural",
+        "rate": "+2%",
+        "pitch": "+4Hz"
+      },
+      "silero": {
+        "speaker": "aidar"
+      },
+      "xtts": {
+        "reference_wav": "ref_john.wav"
+      },
+      "post": "eq_male_close",
+      "note": "Уверенно, с лёгкой улыбкой в голосе, без напора."
+    },
+    "mary": {
+      "title": "Мэри",
+      "edge": {
+        "voice": "ru-RU-SvetlanaNeural",
+        "rate": "-2%",
+        "pitch": "+2Hz",
+        "volume": "+0%"
+      },
+      "silero": {
+        "speaker": "kseniya"
+      },
+      "xtts": {
+        "reference_wav": "ref_mary.wav"
+      },
+      "post": "eq_female_close",
+      "note": "Живая, играющая, немного дразнящая интонация."
+    },
+    "mary_inner": {
+      "title": "Внутренний голос Мэри",
+      "edge": {
+        "voice": "en-US-AvaMultilingualNeural",
+        "rate": "-14%",
+        "pitch": "-4Hz",
+        "volume": "-6%"
+      },
+      "edge_fallback": {
+        "voice": "en-US-EmmaMultilingualNeural",
+        "rate": "-12%",
+        "pitch": "-5Hz"
+      },
+      "silero": {
+        "speaker": "baya"
+      },
+      "xtts": {
+        "reference_wav": "ref_mary.wav"
+      },
+      "post": "intimate_reverb",
+      "note": "Отдельный от Мэри тембр: тише, ближе к микрофону, лёгкая реверберация — мысли, не речь."
+    }
+  },
+  "mix_targets": {
+    "loudness_lufs": -14.0,
+    "true_peak_dbfs": -1.0,
+    "voice_db": 0.0,
+    "music_db": -11.0,
+    "sea_db": -13.0
+  },
+  "lines": [
+    {
+      "id": "VO_001",
+      "shot_id": "S01_SH001",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Солнце уже садилось за горизонт.",
+      "start_sec": 0.45,
+      "est_duration_sec": 2.21,
+      "anchor_sec": 0.35,
+      "drift_sec": 0.1,
+      "chars": 32
+    },
+    {
+      "id": "VO_002",
+      "shot_id": "S01_SH002",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Её вечер сложился одиноко: друзья укатили на шумную вечеринку, где ей совсем не хотелось быть.",
+      "start_sec": 7.35,
+      "est_duration_sec": 6.48,
+      "anchor_sec": 7.35,
+      "drift_sec": 0.0,
+      "chars": 94
+    },
+    {
+      "id": "VO_003",
+      "shot_id": "S01_SH004",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Ей нужны были покой и тишина. Море давало ей именно это.",
+      "start_sec": 18.35,
+      "est_duration_sec": 3.86,
+      "anchor_sec": 18.35,
+      "drift_sec": 0.0,
+      "chars": 56
+    },
+    {
+      "id": "VO_004",
+      "shot_id": "S01_SH008",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "В этот же вечер, вдали от людской суеты, по тёплому песку гулял молодой человек.",
+      "start_sec": 36.35,
+      "est_duration_sec": 5.52,
+      "anchor_sec": 36.35,
+      "drift_sec": 0.0,
+      "chars": 80
+    },
+    {
+      "id": "VO_005",
+      "shot_id": "S01_SH010",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Он держал в руках свои тапочки и любовался накатами вечерних волн.",
+      "start_sec": 46.35,
+      "est_duration_sec": 4.55,
+      "anchor_sec": 46.35,
+      "drift_sec": 0.0,
+      "chars": 66
+    },
+    {
+      "id": "VO_006",
+      "shot_id": "S01_SH011",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Она была не из стеснительных и не брезговала разглядывать симпатичных прохожих.",
+      "start_sec": 51.35,
+      "est_duration_sec": 5.45,
+      "anchor_sec": 51.35,
+      "drift_sec": 0.0,
+      "chars": 79
+    },
+    {
+      "id": "VO_007",
+      "shot_id": "S01_SH013",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Он поймал себя на мысли, что задержал взгляд слишком долго. И это его нисколько не смутило.",
+      "start_sec": 62.85,
+      "est_duration_sec": 6.28,
+      "anchor_sec": 62.85,
+      "drift_sec": 0.0,
+      "chars": 91
+    },
+    {
+      "id": "VO_008",
+      "shot_id": "S01_SH014",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Холодные капли скатились по её руке на бедро — и напомнили ему о собственной жажде.",
+      "start_sec": 69.58,
+      "est_duration_sec": 5.72,
+      "anchor_sec": 67.85,
+      "drift_sec": 1.73,
+      "chars": 83
+    },
+    {
+      "id": "VO_009",
+      "shot_id": "S01_SH016",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Два коктейля. Точно такие же, как у той прекрасной девушки на пляже.",
+      "start_sec": 77.85,
+      "est_duration_sec": 4.69,
+      "anchor_sec": 77.85,
+      "drift_sec": 0.0,
+      "chars": 68
+    },
+    {
+      "id": "VO_010",
+      "shot_id": "S01_SH019",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Что-то глубоко внутри него уже начало разгораться.",
+      "start_sec": 92.35,
+      "est_duration_sec": 3.45,
+      "anchor_sec": 92.35,
+      "drift_sec": 0.0,
+      "chars": 50
+    },
+    {
+      "id": "VO_011",
+      "shot_id": "S01_SH021",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "От вечернего спокойствия не осталось и следа.",
+      "start_sec": 101.35,
+      "est_duration_sec": 3.1,
+      "anchor_sec": 101.35,
+      "drift_sec": 0.0,
+      "chars": 45
+    },
+    {
+      "id": "VO_012",
+      "shot_id": "S01_SH022",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Еле слышный треск по левую руку заставил её вздрогнуть.",
+      "start_sec": 106.35,
+      "est_duration_sec": 3.79,
+      "anchor_sec": 106.35,
+      "drift_sec": 0.0,
+      "chars": 55
+    },
+    {
+      "id": "VO_013",
+      "shot_id": "S01_SH023",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Джон. Прошу прощения, если напугал. Не думал, что у меня есть задатки ниндзя.",
+      "start_sec": 111.35,
+      "est_duration_sec": 5.31,
+      "anchor_sec": 111.35,
+      "drift_sec": 0.0,
+      "chars": 77
+    },
+    {
+      "id": "VO_014",
+      "shot_id": "S01_SH025",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "Извините, я не беру напитков от незнакомцев. Мэри.",
+      "start_sec": 122.85,
+      "est_duration_sec": 3.45,
+      "anchor_sec": 122.85,
+      "drift_sec": 0.0,
+      "chars": 50
+    },
+    {
+      "id": "VO_015",
+      "shot_id": "S01_SH026",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Вечер жаркий. Глядя на вас, мне очень захотелось такой же коктейль. Да так, что взял сразу два. Я не настаиваю. Не против, если присяду?",
+      "start_sec": 127.85,
+      "est_duration_sec": 9.38,
+      "anchor_sec": 127.85,
+      "drift_sec": 0.0,
+      "chars": 136
+    },
+    {
+      "id": "VO_016",
+      "shot_id": "S01_SH027",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "Пока ещё холодный. Приятно познакомиться.",
+      "start_sec": 137.68,
+      "est_duration_sec": 2.83,
+      "anchor_sec": 133.85,
+      "drift_sec": 3.83,
+      "chars": 41
+    },
+    {
+      "id": "VO_017",
+      "shot_id": "S01_SH029",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "И их бокалы звонко ударились друг о друга, ещё сильнее разжигая любопытство в обоих.",
+      "start_sec": 142.85,
+      "est_duration_sec": 5.79,
+      "anchor_sec": 142.85,
+      "drift_sec": 0.0,
+      "chars": 84
+    },
+    {
+      "id": "VO_018",
+      "shot_id": "S01_SH031",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "Может, тоже хочешь? В левом ухе у меня наушники никогда не держатся.",
+      "start_sec": 153.85,
+      "est_duration_sec": 4.69,
+      "anchor_sec": 153.85,
+      "drift_sec": 0.0,
+      "chars": 68
+    },
+    {
+      "id": "VO_019",
+      "shot_id": "S01_SH033",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Погоди… это что, Muse? Ещё ни разу не встречал здесь их фанатов.",
+      "start_sec": 164.35,
+      "est_duration_sec": 4.41,
+      "anchor_sec": 164.35,
+      "drift_sec": 0.0,
+      "chars": 64
+    },
+    {
+      "id": "VO_020",
+      "shot_id": "S01_SH034",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "А я не местная. Приехала пару дней назад с друзьями. Они уехали на вечеринку, а мне не хотелось трястись в дороге ради плясок.",
+      "start_sec": 169.35,
+      "est_duration_sec": 8.69,
+      "anchor_sec": 169.35,
+      "drift_sec": 0.0,
+      "chars": 126
+    },
+    {
+      "id": "VO_021",
+      "shot_id": "S01_SH036",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Но Джон уже не слышал последних слов. Капля сорвалась с трубочки и упала на её ключицу.",
+      "start_sec": 179.85,
+      "est_duration_sec": 6.0,
+      "anchor_sec": 179.85,
+      "drift_sec": 0.0,
+      "chars": 87
+    },
+    {
+      "id": "VO_022",
+      "shot_id": "S01_SH038",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Он оторвался от этого зрелища — и встретился с её глазами, завораживающими малахитовым свечением.",
+      "start_sec": 189.85,
+      "est_duration_sec": 6.69,
+      "anchor_sec": 189.85,
+      "drift_sec": 0.0,
+      "chars": 97
+    },
+    {
+      "id": "VO_023",
+      "shot_id": "S01_SH039",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Разговор становился всё тише, а берег — всё темнее.",
+      "start_sec": 196.99,
+      "est_duration_sec": 3.52,
+      "anchor_sec": 194.35,
+      "drift_sec": 2.64,
+      "chars": 51
+    },
+    {
+      "id": "VO_024",
+      "shot_id": "S01_SH040",
+      "speaker": "mary_inner",
+      "speaker_title": "Внутренний голос Мэри",
+      "text": "Интересно, о чём он думает. Что я недотрога? Или наоборот — свободная?",
+      "start_sec": 200.96,
+      "est_duration_sec": 4.83,
+      "anchor_sec": 200.35,
+      "drift_sec": 0.61,
+      "chars": 70
+    },
+    {
+      "id": "VO_025",
+      "shot_id": "S01_SH041",
+      "speaker": "mary_inner",
+      "speaker_title": "Внутренний голос Мэри",
+      "text": "В любом случае, он уже точно у меня на крючке.",
+      "start_sec": 206.23,
+      "est_duration_sec": 3.17,
+      "anchor_sec": 205.35,
+      "drift_sec": 0.88,
+      "chars": 46
+    },
+    {
+      "id": "VO_026",
+      "shot_id": "S01_SH042",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "Ты заметил? Бар закрылся. Мы что, остались здесь одни?",
+      "start_sec": 210.35,
+      "est_duration_sec": 3.72,
+      "anchor_sec": 210.35,
+      "drift_sec": 0.0,
+      "chars": 54
+    },
+    {
+      "id": "VO_027",
+      "shot_id": "S01_SH043",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Давно хотел искупаться ночью, пока никого нет. Присоединишься?",
+      "start_sec": 215.35,
+      "est_duration_sec": 4.28,
+      "anchor_sec": 215.35,
+      "drift_sec": 0.0,
+      "chars": 62
+    },
+    {
+      "id": "VO_028",
+      "shot_id": "S01_SH044",
+      "speaker": "mary",
+      "speaker_title": "Мэри",
+      "text": "Ха-ха. Но я без купальника. Не купаться же мне в платье?",
+      "start_sec": 221.35,
+      "est_duration_sec": 3.86,
+      "anchor_sec": 221.35,
+      "drift_sec": 0.0,
+      "chars": 56
+    },
+    {
+      "id": "VO_029",
+      "shot_id": "S01_SH045",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "У меня тоже нет. Но ты же сама сказала — мы здесь одни.",
+      "start_sec": 226.35,
+      "est_duration_sec": 3.79,
+      "anchor_sec": 226.35,
+      "drift_sec": 0.0,
+      "chars": 55
+    },
+    {
+      "id": "VO_030",
+      "shot_id": "S01_SH046",
+      "speaker": "mary_inner",
+      "speaker_title": "Внутренний голос Мэри",
+      "text": "Да и хрен с ним. Я здесь всего на две недели.",
+      "start_sec": 231.35,
+      "est_duration_sec": 3.1,
+      "anchor_sec": 231.35,
+      "drift_sec": 0.0,
+      "chars": 45
+    },
+    {
+      "id": "VO_031",
+      "shot_id": "S01_SH049",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Она впервые в жизни плавала ночью. И это было невероятное впечатление.",
+      "start_sec": 246.85,
+      "est_duration_sec": 4.83,
+      "anchor_sec": 246.85,
+      "drift_sec": 0.0,
+      "chars": 70
+    },
+    {
+      "id": "VO_032",
+      "shot_id": "S01_SH050",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Вода обнимала каждый сантиметр её кожи. Она ощущала себя в невесомости, а бесконечное небо создавало иллюзию полёта.",
+      "start_sec": 253.35,
+      "est_duration_sec": 8.0,
+      "anchor_sec": 253.35,
+      "drift_sec": 0.0,
+      "chars": 116
+    },
+    {
+      "id": "VO_033",
+      "shot_id": "S01_SH051",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "И только неожиданное касание её талии вернуло Мэри к осмыслению.",
+      "start_sec": 261.8,
+      "est_duration_sec": 4.41,
+      "anchor_sec": 259.85,
+      "drift_sec": 1.95,
+      "chars": 64
+    },
+    {
+      "id": "VO_034",
+      "shot_id": "S01_SH053",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Азарт и страсть стояли в воздухе, как густой туман.",
+      "start_sec": 270.35,
+      "est_duration_sec": 3.52,
+      "anchor_sec": 270.35,
+      "drift_sec": 0.0,
+      "chars": 51
+    },
+    {
+      "id": "VO_035",
+      "shot_id": "S01_SH054",
+      "speaker": "john",
+      "speaker_title": "Джон",
+      "text": "Хочешь, я тебя покружу?",
+      "start_sec": 275.35,
+      "est_duration_sec": 1.59,
+      "anchor_sec": 275.35,
+      "drift_sec": 0.0,
+      "chars": 23
+    },
+    {
+      "id": "VO_036",
+      "shot_id": "S01_SH055",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Ей нравилось, что он не ведёт себя нагло. Уверенно и прямолинейно — и в то же время уважительно.",
+      "start_sec": 280.35,
+      "est_duration_sec": 6.62,
+      "anchor_sec": 280.35,
+      "drift_sec": 0.0,
+      "chars": 96
+    },
+    {
+      "id": "VO_037",
+      "shot_id": "S01_SH057",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Напряжение наконец сменилось доверием.",
+      "start_sec": 292.35,
+      "est_duration_sec": 2.62,
+      "anchor_sec": 292.35,
+      "drift_sec": 0.0,
+      "chars": 38
+    },
+    {
+      "id": "VO_038",
+      "shot_id": "S01_SH058",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Их дыхания смешались, словно они были одним целым.",
+      "start_sec": 297.35,
+      "est_duration_sec": 3.45,
+      "anchor_sec": 297.35,
+      "drift_sec": 0.0,
+      "chars": 50
+    },
+    {
+      "id": "VO_039",
+      "shot_id": "S01_SH059",
+      "speaker": "narrator",
+      "speaker_title": "Рассказчик",
+      "text": "Продолжение следует.",
+      "start_sec": 303.85,
+      "est_duration_sec": 1.38,
+      "anchor_sec": 303.85,
+      "drift_sec": 0.0,
+      "chars": 20
+    }
+  ],
+  "warnings": [
+    "VO_016 (S01_SH027): сдвинута на 3.8 c от своего плана — подрежьте текст выше",
+    "VO_023 (S01_SH039): сдвинута на 2.6 c от своего плана — подрежьте текст выше"
+  ],
+  "speaker_line_counts": {
+    "narrator": 23,
+    "john": 7,
+    "mary": 6,
+    "mary_inner": 3
+  }
+}
