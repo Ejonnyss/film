@@ -352,8 +352,9 @@ cells.append(code(
 
 cells.append(md(
 "## 9. Ключевые кадры (59 шт)\n",
-"Генерируются в 1024×576, затем апскейл. Уже готовые пропускаются —\n",
-"можно смело перезапускать после обрыва сессии."
+"**ТОЧКА 1:** сначала генерируются только SH001–SH006. Посмотрите контактный лист,\n",
+"оцените Arcane-стиль и палитру. Только после явного «ок» переключите\n",
+"`GATE_1_APPROVED = True` и перезапустите эту ячейку для остальных кадров."
 ))
 cells.append(code(
 "ARCANE_LORA = 'arcane_style_xl_v1.safetensors'\n",
@@ -378,8 +379,10 @@ cells.append(code(
 "    }\n",
 "\n",
 "import shutil\n",
+"GATE_1_APPROVED = False  # менять на True только после одобрения контактного листа 6 кадров\n",
+"KEYFRAME_SHOTS = SHOTS if GATE_1_APPROVED else SHOTS[:6]\n",
 "done = skipped = 0\n",
-"for s in SHOTS:\n",
+"for s in KEYFRAME_SHOTS:\n",
 "    dst = f\"{DIRS['keyframes']}/{s['shot_id']}.png\"\n",
 "    if os.path.exists(dst):\n",
 "        skipped += 1; continue\n",
@@ -387,18 +390,21 @@ cells.append(code(
 "        files_out = queue(wf_keyframe(s['keyframe_prompt'], s['keyframe_negative'], s['seed']))\n",
 "        shutil.copy(files_out[0], dst)\n",
 "        done += 1\n",
-"        print(f\"[{done+skipped}/{len(SHOTS)}] {s['shot_id']} OK\")\n",
+"        print(f\"[{done+skipped}/{len(KEYFRAME_SHOTS)}] {s['shot_id']} OK\")\n",
 "    except Exception as e:\n",
 "        raise RuntimeError(f\"{s['shot_id']} keyframe failed: {e}\") from e\n",
 "\n",
-"print(f'\\nГотово: {done} новых, {skipped} уже было')"
+"print(f'\\nГотово: {done} новых, {skipped} уже было')\n",
+"if not GATE_1_APPROVED:\n",
+"    print('СТОП — ТОЧКА 1. Покажите _contact_sheet.jpg и ждите одобрения перед 59 кадрами.')"
 ))
 
 cells.append(md("### 9b. Просмотр контактного листа"))
 cells.append(code(
 "import glob\n",
 "from PIL import Image, ImageDraw\n",
-"paths = sorted(glob.glob(f\"{DIRS['keyframes']}/*.png\"))\n",
+"paths = [f\"{DIRS['keyframes']}/{s['shot_id']}.png\" for s in KEYFRAME_SHOTS\n",
+"         if os.path.exists(f\"{DIRS['keyframes']}/{s['shot_id']}.png\")]\n",
 "print(len(paths), 'кадров')\n",
 "if paths:\n",
 "    cols, tw = 6, 320\n",
@@ -433,7 +439,8 @@ cells.append(md(
 "## 10. Подстановка лиц (InstantID)\n",
 "38 планов с лицами. Для парных планов — **два прохода по очереди**\n",
 "(сначала Мэри, потом Джон). Каждый проход имеет свою маску и target-keypoints;\n",
-"промежуточные файлы сохраняются. Ошибка останавливает этап: fallback без лица запрещён."
+"промежуточные файлы сохраняются. **ТОЧКА 2:** сначала только SH003 (Мэри),\n",
+"SH008 (Джон) и SH012 (пара). После одобрения выставьте `GATE_2_APPROVED = True`."
 ))
 cells.append(code(
 "import cv2, json, numpy as np\n",
@@ -520,9 +527,13 @@ cells.append(code(
 "REFS = {'john':'john.png', 'mary':'mary.jpg'}\n",
 "IN   = '/content/ComfyUI/input'\n",
 "PASS_DIR = f\"{DIRS['faces']}/_passes\"; os.makedirs(PASS_DIR, exist_ok=True)\n",
+"if not GATE_1_APPROVED: raise RuntimeError('Сначала получите одобрение ТОЧКИ 1 и завершите 59 keyframes')\n",
+"FACE_SMOKE_IDS = ['S01_SH003','S01_SH008','S01_SH012']\n",
+"GATE_2_APPROVED = False  # True только после одобрения трёх контрольных лиц\n",
+"FACE_SHOTS = SHOTS if GATE_2_APPROVED else [s for s in SHOTS if s['shot_id'] in FACE_SMOKE_IDS]\n",
 "done = skipped = 0\n",
 "\n",
-"for s in SHOTS:\n",
+"for s in FACE_SHOTS:\n",
 "    dst = f\"{DIRS['faces']}/{s['shot_id']}.png\"\n",
 "    src = f\"{DIRS['keyframes']}/{s['shot_id']}.png\"\n",
 "    if os.path.exists(dst): skipped += 1; continue\n",
@@ -546,13 +557,13 @@ cells.append(code(
 "        if len(detected) < len(s['face_order']):\n",
 "            raise RuntimeError(f\"{s['shot_id']}: output face detection {len(detected)}/{len(s['face_order'])}\")\n",
 "        done += 1\n",
-"        print(f\"[{done+skipped}/{len(SHOTS)}] {s['shot_id']} лица: {s['face_order']}\")\n",
+"        print(f\"[{done+skipped}/{len(FACE_SHOTS)}] {s['shot_id']} лица: {s['face_order']}\")\n",
 "    except Exception as e:\n",
 "        raise RuntimeError(f\"{s['shot_id']} InstantID failed; no fallback allowed: {e}\") from e\n",
 "\n",
-"# QC заново проверяет все 38 face-планов, включая результаты из Drive-кэша.\n",
+"# QC проверяет активную партию; после gate 2 — все 38 face-планов.\n",
 "face_qc=[]\n",
-"for s in SHOTS:\n",
+"for s in FACE_SHOTS:\n",
 "    if not s['apply_face_id']: continue\n",
 "    p=f\"{DIRS['faces']}/{s['shot_id']}.png\"; _,detected=detect_faces(p)\n",
 "    expected=len(s['face_order'])\n",
@@ -569,11 +580,22 @@ cells.append(code(
 "json.dump(face_qc,open(qc_path,'w'),ensure_ascii=False,indent=2)\n",
 "mixed=[r for r in face_qc if r['identity_margin'] <= 0]\n",
 "if mixed: raise RuntimeError(f'Возможное смешение личностей: {mixed[:8]}')\n",
-"print(f'\\nГотово: {done} новых, {skipped} пропущено')"
+"smoke_paths=[f\"{DIRS['faces']}/{sid}.png\" for sid in FACE_SMOKE_IDS]\n",
+"if all(os.path.exists(p) for p in smoke_paths):\n",
+"    face_sheet=Image.new('RGB',(960,180),(10,20,30))\n",
+"    fd=ImageDraw.Draw(face_sheet)\n",
+"    for i,p in enumerate(smoke_paths):\n",
+"        face_sheet.paste(Image.open(p).convert('RGB').resize((320,180)),(i*320,0))\n",
+"        fd.rectangle((i*320,0,i*320+112,22),fill=(0,0,0)); fd.text((i*320+5,4),FACE_SMOKE_IDS[i],fill='white')\n",
+"    face_sheet.save(f\"{DIRS['faces']}/_checkpoint_2_faces.jpg\",quality=90); display(face_sheet)\n",
+"print(f'\\nГотово: {done} новых, {skipped} пропущено')\n",
+"if not GATE_2_APPROVED:\n",
+"    print('СТОП — ТОЧКА 2. Покажите _checkpoint_2_faces.jpg и ждите одобрения.')"
 ))
 
 cells.append(md("## 11. Нейронный апскейл до 1080p (4x-UltraSharp)"))
 cells.append(code(
+"if not GATE_2_APPROVED: raise RuntimeError('Сначала получите одобрение ТОЧКИ 2 и завершите face-проходы')\n",
 "def wf_upscale(image_name):\n",
 "    return {\n",
 "      '1':{'class_type':'LoadImage','inputs':{'image':image_name}},\n",
@@ -607,7 +629,8 @@ cells.append(code(
 cells.append(md(
 "## 12. Анимация кадров (image-to-video)\n",
 "Каждый кадр оживает в короткий клип по своему motion-промпту.\n",
-"Это самый долгий этап — идёт пачками, прогресс сохраняется на Drive.\n",
+"**ТОЧКА 3:** сначала генерируются два face-клипа SH003 и SH008. Проверьте\n",
+"стабильность лиц и движение; после одобрения выставьте `GATE_3_APPROVED = True`.\n",
 "\n",
 "Официальная цепочка LTX 0.9.5: отдельный T5XXL, preprocess, LTX-conditioning,\n",
 "LTX-scheduler и custom sampler. 97 кадров дают ~4 с настоящего движения."
@@ -646,8 +669,12 @@ cells.append(code(
 "    }\n",
 "\n",
 "MAX_FRAMES = 97          # LTX требует 8n+1; ~4.0 c при 24 fps\n",
+"if not GATE_2_APPROVED: raise RuntimeError('Сначала получите одобрение ТОЧКИ 2')\n",
+"I2V_SMOKE_IDS = ['S01_SH003','S01_SH008']\n",
+"GATE_3_APPROVED = False  # True только после просмотра двух контрольных клипов\n",
+"VIDEO_SHOTS = SHOTS if GATE_3_APPROVED else [s for s in SHOTS if s['shot_id'] in I2V_SMOKE_IDS]\n",
 "done = skipped = 0\n",
-"for s in SHOTS:\n",
+"for s in VIDEO_SHOTS:\n",
 "    dst = f\"{DIRS['clips']}/{s['shot_id']}.mp4\"\n",
 "    src = f\"{DIRS['upscaled']}/{s['shot_id']}.png\"\n",
 "    if os.path.exists(dst): skipped += 1; continue\n",
@@ -660,18 +687,18 @@ cells.append(code(
 "                           frames=frames, seed=s['seed']), timeout=1800)\n",
 "        shutil.copy(out[0], dst)\n",
 "        done += 1\n",
-"        print(f\"[{done+skipped}/{len(SHOTS)}] {s['shot_id']} {frames}к OK\")\n",
+"        print(f\"[{done+skipped}/{len(VIDEO_SHOTS)}] {s['shot_id']} {frames}к OK\")\n",
 "    except Exception as e:\n",
 "        raise RuntimeError(f\"{s['shot_id']} i2v failed: {e}\") from e\n",
 "\n",
-"clips=[f\"{DIRS['clips']}/{s['shot_id']}.mp4\" for s in SHOTS]\n",
+"clips=[f\"{DIRS['clips']}/{s['shot_id']}.mp4\" for s in VIDEO_SHOTS]\n",
 "missing=[p for p in clips if not os.path.exists(p)]\n",
 "if missing: raise RuntimeError(f'Missing i2v clips: {missing[:8]}')\n",
 "\n",
 "# Face-motion QC: начало/середина/конец каждого face-клипа.\n",
 "motion_qc=[]; motion_bad=[]\n",
 "motion_dir=f\"{DIRS['clips']}/_face_qc\"; os.makedirs(motion_dir,exist_ok=True)\n",
-"for s in SHOTS:\n",
+"for s in VIDEO_SHOTS:\n",
 "    if not s['apply_face_id']: continue\n",
 "    cap=cv2.VideoCapture(f\"{DIRS['clips']}/{s['shot_id']}.mp4\")\n",
 "    count=int(cap.get(cv2.CAP_PROP_FRAME_COUNT)); baseline={}\n",
@@ -699,7 +726,12 @@ cells.append(code(
 "json.dump({'samples':motion_qc,'failed':motion_bad},\n",
 "          open(f\"{DIRS['clips']}/face_motion_qc.json\",'w'),ensure_ascii=False,indent=2)\n",
 "if motion_bad: raise RuntimeError(f'Лица плывут/не распознаны; перерендерить seed: {motion_bad[:8]}')\n",
-"print(f'\\nКлипов: {done} новых, {skipped} из кэша; 59/59 на месте; face-motion QC пройден')"
+"from IPython.display import Video, display\n",
+"if not GATE_3_APPROVED:\n",
+"    for sid in I2V_SMOKE_IDS: display(Video(f\"{DIRS['clips']}/{sid}.mp4\",embed=True,width=640))\n",
+"    print('СТОП — ТОЧКА 3. Покажите два клипа и ждите одобрения.')\n",
+"else:\n",
+"    print(f'\\nКлипов: {done} новых, {skipped} из кэша; 59/59 на месте; face-motion QC пройден')"
 ))
 
 cells.append(md(
@@ -710,6 +742,7 @@ cells.append(md(
 ))
 cells.append(code(
 "import subprocess, os\n",
+"if not GATE_3_APPROVED: raise RuntimeError('Сначала получите одобрение ТОЧКИ 3 и завершите 59 i2v-клипов')\n",
 "WORK = '/content/assembly'; os.makedirs(WORK, exist_ok=True)\n",
 "\n",
 "segments = []\n",
@@ -750,14 +783,15 @@ cells.append(code(
 cells.append(md(
 "## 14. Озвучка — красивые русские голоса\n",
 "\n",
-"Четыре разных голоса вместо системного TTS:\n",
+"Четыре роли и три базовых TTS-тембра вместо системного TTS. Мысли Мэри\n",
+"звучат её же голосом; контраст создают темп, высота, громкость и реверберация:\n",
 "\n",
 "| Роль | Голос | Характер |\n",
 "|---|---|---|\n",
 "| Рассказчик | `ru-RU-DmitryNeural` −12% темпа | спокойный, тёплый, с паузами |\n",
 "| Джон | `en-US-AndrewMultilingualNeural` | мягкий уверенный мужской |\n",
 "| Мэри | `ru-RU-SvetlanaNeural` | живая, играющая |\n",
-"| Мысли Мэри | `en-US-AvaMultilingualNeural` | отдельный интимный тембр + реверберация |\n",
+"| Мысли Мэри | `ru-RU-SvetlanaNeural` −14%, ниже и тише | тот же человек + реверберация |\n",
 "\n",
 "**Edge TTS** — нейронные голоса Microsoft: бесплатно, без ключа и регистрации,\n",
 "качество несравнимо выше `macOS say`. Ниже есть альтернативы: Silero (офлайн)\n",
@@ -783,7 +817,9 @@ cells.append(code(
 "VOICES = vp['voices']\n",
 "LINES  = vp['lines']\n",
 "assert len(LINES)==39, len(LINES)\n",
-"assert len({v['edge']['voice'] for v in VOICES.values()})==4, 'Нужны четыре разных TTS-голоса'\n",
+"assert len(VOICES)==4, 'Нужны четыре роли'\n",
+"assert len({v['edge']['voice'] for v in VOICES.values()})==3, 'Ожидаются три базовых тембра'\n",
+"assert VOICES['mary']['edge']['voice']==VOICES['mary_inner']['edge']['voice']\n",
 "print(f\"{len(LINES)} реплик | фильм {vp['film_duration_sec']} c\")\n",
 "for k, n in vp['speaker_line_counts'].items():\n",
 "    v = VOICES[k]['edge']\n",

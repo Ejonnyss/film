@@ -6,11 +6,11 @@
 Собирает voice_pack.json: реплики, говорящие, привязка к планам, тайминги
 (считаются из shots_arcane.json) и параметры голосов для трёх движков TTS.
 
-Четыре голоса:
+Четыре роли, три базовых TTS-тембра:
   narrator    — закадровый рассказчик, спокойный мужской
   john        — Джон, тёплый уверенный мужской
   mary        — Мэри, живой женский
-  mary_inner  — внутренний монолог Мэри (отдельный женский тембр + обработка)
+  mary_inner  — внутренний монолог Мэри (тот же тембр, тише/ниже + обработка)
 
 Запуск:  python3 build_voice_pack.py
 """
@@ -54,12 +54,11 @@ VOICES = {
     },
     "mary_inner": {
         "title": "Внутренний голос Мэри",
-        "edge":   {"voice": "en-US-AvaMultilingualNeural", "rate": "-14%", "pitch": "-4Hz", "volume": "-6%"},
-        "edge_fallback": {"voice": "en-US-EmmaMultilingualNeural", "rate": "-12%", "pitch": "-5Hz"},
-        "silero": {"speaker": "baya"},
+        "edge":   {"voice": "ru-RU-SvetlanaNeural", "rate": "-14%", "pitch": "-4Hz", "volume": "-6%"},
+        "silero": {"speaker": "kseniya"},
         "xtts":   {"reference_wav": "ref_mary.wav"},
         "post":   "intimate_reverb",
-        "note":   "Отдельный от Мэри тембр: тише, ближе к микрофону, лёгкая реверберация — мысли, не речь.",
+        "note":   "Тот же тембр, что у Мэри, но тише, ниже и с реверберацией — это её мысли, а не другой персонаж",
     },
 }
 

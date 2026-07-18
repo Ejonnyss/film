@@ -68,24 +68,19 @@
     "mary_inner": {
       "title": "Внутренний голос Мэри",
       "edge": {
-        "voice": "en-US-AvaMultilingualNeural",
+        "voice": "ru-RU-SvetlanaNeural",
         "rate": "-14%",
         "pitch": "-4Hz",
         "volume": "-6%"
       },
-      "edge_fallback": {
-        "voice": "en-US-EmmaMultilingualNeural",
-        "rate": "-12%",
-        "pitch": "-5Hz"
-      },
       "silero": {
-        "speaker": "baya"
+        "speaker": "kseniya"
       },
       "xtts": {
         "reference_wav": "ref_mary.wav"
       },
       "post": "intimate_reverb",
-      "note": "Отдельный от Мэри тембр: тише, ближе к микрофону, лёгкая реверберация — мысли, не речь."
+      "note": "Тот же тембр, что у Мэри, но тише, ниже и с реверберацией — это её мысли, а не другой персонаж"
     }
   },
   "mix_targets": {
